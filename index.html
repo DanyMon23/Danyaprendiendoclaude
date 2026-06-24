@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>soy · Tu asistente personal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="header-content">
+      <div class="app-brand">
+        <span class="app-logo">🌿</span>
+        <div>
+          <h1 class="app-name">soy</h1>
+          <p class="app-tagline">Tu asistente personal</p>
+        </div>
+      </div>
+      <div class="date-display">
+        <span class="date-day" id="date-day"></span>
+        <span class="date-full" id="date-full"></span>
+      </div>
+    </div>
+  </header>
+
+  <div id="toast" class="toast" aria-live="polite"></div>
+
+  <main class="app-main">
+
+    <div class="left-column">
+
+      <section class="input-section card">
+        <h2 class="section-title">¿Qué tienes en mente?</h2>
+        <textarea
+          id="entry-input"
+          class="entry-textarea"
+          placeholder="Escribe libremente… reflexiones, pendientes, ideas, emociones, notas de reuniones…"
+          rows="4"
+          aria-label="Escribe tu entrada"
+        ></textarea>
+        <div class="input-footer">
+          <div class="category-indicator">
+            <span class="detected-label">Categoría:</span>
+            <select id="category-select" class="category-select" aria-label="Categoría">
+              <option value="">Escribe algo…</option>
+            </select>
+          </div>
+          <div class="input-actions">
+            <span class="shortcut-hint">Ctrl+Enter para guardar</span>
+            <button id="save-btn" class="save-btn" disabled aria-label="Guardar entrada">
+              Guardar <span class="btn-icon" aria-hidden="true">✦</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="timeline-section">
+        <div class="section-header">
+          <h2 class="section-title">Hoy</h2>
+          <div class="filter-chips" id="filter-chips" role="group" aria-label="Filtrar por categoría">
+            <button class="chip active" data-filter="all">Todo</button>
+          </div>
+        </div>
+        <div class="timeline" id="timeline" aria-live="polite">
+          <div class="empty-state" id="empty-state">
+            <span class="empty-icon" aria-hidden="true">🌱</span>
+            <p>Comienza escribiendo tus pensamientos del día</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="card tasks-section">
+        <div class="tasks-top">
+          <h2 class="section-title">Tareas del día</h2>
+          <div class="tasks-tabs" role="tablist">
+            <button class="tasks-tab active" data-tab="today" role="tab">Hoy</button>
+            <button class="tasks-tab" data-tab="routines" role="tab">Rutinas semanales</button>
+          </div>
+        </div>
+
+        <!-- Panel: Hoy -->
+        <div id="tasks-today-panel" class="tasks-panel">
+          <div class="task-add-row">
+            <input type="text" id="task-input" class="task-input" placeholder="Agregar tarea para hoy…" maxlength="200" aria-label="Nueva tarea" />
+            <button id="task-add-btn" class="task-add-btn" disabled aria-label="Agregar tarea">+</button>
+          </div>
+          <div id="tasks-list" class="tasks-list" aria-live="polite">
+            <p class="no-data">Sin tareas · Agrega una arriba o configura tus rutinas semanales</p>
+          </div>
+          <div id="tasks-summary" class="tasks-summary hidden"></div>
+          <div class="day-actions-row">
+            <p class="export-desc" id="export-desc">Agrega entradas para guardar tu nota del día en iPad</p>
+            <div class="day-btns">
+              <button id="save-day-btn" class="save-day-btn">Guardar resumen <span aria-hidden="true">📊</span></button>
+              <button id="export-btn" class="export-btn" disabled aria-label="Guardar en iPad Notes">
+                <span>Guardar en iPad</span>
+                <span class="btn-icon" aria-hidden="true">📱</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel: Rutinas semanales -->
+        <div id="tasks-routines-panel" class="tasks-panel hidden">
+          <div class="routine-add-form">
+            <input type="text" id="routine-text" class="task-input" placeholder="Descripción de la tarea rutinaria…" maxlength="200" aria-label="Nueva rutina" />
+            <div class="days-selector" id="days-selector" role="group" aria-label="Días de la semana">
+              <button class="day-btn" data-day="1" type="button">Lu</button>
+              <button class="day-btn" data-day="2" type="button">Ma</button>
+              <button class="day-btn" data-day="3" type="button">Mi</button>
+              <button class="day-btn" data-day="4" type="button">Ju</button>
+              <button class="day-btn" data-day="5" type="button">Vi</button>
+              <button class="day-btn" data-day="6" type="button">Sa</button>
+              <button class="day-btn" data-day="0" type="button">Do</button>
+            </div>
+            <button id="routine-add-btn" class="routine-add-btn" disabled>Agregar rutina</button>
+          </div>
+          <div id="routines-list" class="routines-list" aria-live="polite">
+            <p class="no-data">Sin rutinas configuradas · Agrega tareas que se repiten cada semana</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="card date-lookup-section">
+        <h2 class="section-title lookup-title">Consultar notas</h2>
+        <div class="date-picker-row">
+          <input type="date" id="lookup-date" class="date-input" aria-label="Fecha a consultar" />
+          <button id="lookup-btn" class="lookup-btn">Ver notas</button>
+        </div>
+        <div id="lookup-results" class="lookup-results" aria-live="polite">
+          <p class="no-data">Elige una fecha para ver sus notas</p>
+        </div>
+      </section>
+
+      <section class="card monthly-section">
+        <div class="monthly-header">
+          <h2 class="section-title">Tendencias mensuales</h2>
+          <select id="monthly-select" class="monthly-select" aria-label="Mes a consultar"></select>
+        </div>
+        <div id="monthly-content" class="monthly-content">
+          <p class="no-data">Guarda tu primer resumen diario para ver las tendencias</p>
+        </div>
+      </section>
+
+    </div>
+
+    <aside class="right-column">
+
+      <section class="card metrics-section">
+        <h2 class="section-title">Métricas del día</h2>
+        <div class="stats-row">
+          <div class="stat-item">
+            <span class="stat-number" id="total-entries">0</span>
+            <span class="stat-label">entradas</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number" id="categories-count">0</span>
+            <span class="stat-label">categorías</span>
+          </div>
+        </div>
+        <div class="category-bars" id="category-bars">
+          <p class="no-data">Aún no hay datos del día</p>
+        </div>
+      </section>
+
+      <section class="card plan-section">
+        <h2 class="section-title">Plan del día</h2>
+        <div class="plan-list" id="plan-list">
+          <p class="no-data">Agrega pendientes para generar tu plan</p>
+        </div>
+      </section>
+
+
+    </aside>
+
+  </main>
+
+  <script src="src/classifier.js"></script>
+  <script src="src/storage.js"></script>
+  <script src="src/metrics.js"></script>
+  <script src="src/tasks.js"></script>
+  <script src="src/monthly.js"></script>
+  <script src="src/app.js"></script>
+</body>
+</html>
